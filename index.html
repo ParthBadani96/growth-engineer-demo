@@ -462,48 +462,37 @@
 
     <script>
 // HubSpot Configuration - ADD THIS AT THE TOP
-const HUBSPOT_API_TOKEN = 'pat-na2-d8208ca5-8ed4-4363-a3f4-db03a84dcf94';
-const HUBSPOT_BASE_URL = 'https://api.hubapi.com';
+const BACKEND_URL = 'https://hubspot-backend-production-2ba5.up.railway.app';
 
 // HubSpot Functions - ADD THESE TOO
 async function createHubSpotContact(leadData) {
-    const contactProperties = {
-        firstname: leadData.firstName,
-        lastname: leadData.lastName,
-        email: leadData.email,
-        company: leadData.company,
-        jobtitle: leadData.jobTitle,
-        hs_lead_status: leadData.qualified ? 'QUALIFIED_TO_BUY' : 'NEW',
-        lead_score: leadData.score.toString(),
-        industry: leadData.industry || '',
-        numberofemployees: leadData.companySize || ''
-    };
-
     try {
-        const response = await fetch(`${HUBSPOT_BASE_URL}/crm/v3/objects/contacts`, {
+        console.log('Sending to backend:', leadData);
+        
+        const response = await fetch(`${BACKEND_URL}/api/hubspot/contacts`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${HUBSPOT_API_TOKEN}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                properties: contactProperties
+                leadData: leadData
             })
         });
 
         if (!response.ok) {
-            throw new Error(`HubSpot API error: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Backend error: ${response.status}`);
         }
 
         const result = await response.json();
-        console.log('Contact created in HubSpot:', result);
-        return result;
+        console.log('Backend success:', result);
+        return result.contact;
+
     } catch (error) {
-        console.error('HubSpot integration error:', error);
+        console.error('Backend integration error:', error);
         throw error;
     }
-}
-     
+}     
         // Global variables for demo
         let leads = [];
         let pageStartTime = Date.now();
