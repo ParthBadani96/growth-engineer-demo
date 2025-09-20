@@ -461,6 +461,49 @@
     </div>
 
     <script>
+// HubSpot Configuration - ADD THIS AT THE TOP
+const HUBSPOT_API_TOKEN = 'pat-na2-d8208ca5-8ed4-4363-a3f4-db03a84dcf94';
+const HUBSPOT_BASE_URL = 'https://api.hubapi.com';
+
+// HubSpot Functions - ADD THESE TOO
+async function createHubSpotContact(leadData) {
+    const contactProperties = {
+        firstname: leadData.firstName,
+        lastname: leadData.lastName,
+        email: leadData.email,
+        company: leadData.company,
+        jobtitle: leadData.jobTitle,
+        hs_lead_status: leadData.qualified ? 'QUALIFIED_TO_BUY' : 'NEW',
+        lead_score: leadData.score.toString(),
+        industry: leadData.industry || '',
+        numberofemployees: leadData.companySize || ''
+    };
+
+    try {
+        const response = await fetch(`${HUBSPOT_BASE_URL}/crm/v3/objects/contacts`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${HUBSPOT_API_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                properties: contactProperties
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HubSpot API error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Contact created in HubSpot:', result);
+        return result;
+    } catch (error) {
+        console.error('HubSpot integration error:', error);
+        throw error;
+    }
+}
+     
         // Global variables for demo
         let leads = [];
         let pageStartTime = Date.now();
@@ -677,47 +720,89 @@
             return techStacks[industry] || techStacks['default'];
         }
 
-        function handleFormSubmit(event) {
-            event.preventDefault();
+        async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const leadData = Object.fromEntries(formData.entries());
+    
+    // Clean session data (remove circular references)
+    const cleanSessionData = {
+        timeOnPage: behavioralData.timeOnPage,
+        scrollDepth: behavioralData.scrollDepth,
+        formInteractions: behavioralData.formInteractions,
+        clickCount: behavioralData.clickEvents.length
+    };
+    
+    // Add timestamp and session data
+    leadData.timestamp = new Date().toISOString();
+    leadData.sessionData = cleanSessionData;
+    leadData.id = Date.now().toString();
+    
+    // Show loading state
+    const submitBtn = event.target.querySelector('.submit-btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Creating Contact...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Enrich the lead data
+        const enrichedLead = enrichLeadData(leadData);
+        
+        // Calculate lead score
+        const score = calculateLeadScore(enrichedLead);
+        enrichedLead.score = score;
+        enrichedLead.qualified = score >= 60;
+        enrichedLead.status = getLeadStatus(score);
+        
+        // Create contact in HubSpot
+        try {
+            const hubspotContact = await createHubSpotContact(enrichedLead);
+            enrichedLead.hubspotContactId = hubspotContact.id;
             
-            const formData = new FormData(event.target);
-            const leadData = Object.fromEntries(formData.entries());
+            addAutomationLog(enrichedLead.firstName + ' ' + enrichedLead.lastName, {
+                action: `✅ Contact created in HubSpot CRM (ID: ${hubspotContact.id})`,
+                priority: 'High',
+                timestamp: new Date().toISOString()
+            });
             
-            // Add timestamp and session data
-            leadData.timestamp = new Date().toISOString();
-            leadData.sessionData = { ...behavioralData };
-            leadData.id = Date.now().toString();
-            
-            // Enrich the lead data
-            const enrichedLead = enrichLeadData(leadData);
-            
-            // Calculate lead score
-            const score = calculateLeadScore(enrichedLead);
-            enrichedLead.score = score;
-            
-            // Determine lead qualification
-            enrichedLead.qualified = score >= 60;
-            enrichedLead.status = getLeadStatus(score);
-            
-            // Store lead
-            leads.push(enrichedLead);
-            localStorage.setItem('demoLeads', JSON.stringify(leads));
-            
-            // Track conversion
-            trackEvent('form_submit', 'demo_request', score);
-            
-            // Trigger automation
-            triggerAutomation(enrichedLead);
-            
-            // Update dashboard
-            updateDashboard();
-            
-            // Show success modal with scoring details
-            showSuccessModal(enrichedLead);
-            
-            // Reset form
-            event.target.reset();
+        } catch (hubspotError) {
+            console.warn('HubSpot integration failed:', hubspotError);
+            addAutomationLog(enrichedLead.firstName + ' ' + enrichedLead.lastName, {
+                action: '⚠️ HubSpot integration failed, saved locally for retry',
+                priority: 'Medium',
+                timestamp: new Date().toISOString()
+            });
         }
+        
+        // Store lead locally (backup)
+        leads.push(enrichedLead);
+        localStorage.setItem('demoLeads', JSON.stringify(leads));
+        
+        // Track conversion
+        trackEvent('form_submit', 'demo_request', score);
+        
+        // Trigger automation
+        triggerAutomation(enrichedLead);
+        
+        // Update dashboard
+        updateDashboard();
+        
+        // Show success modal with scoring details
+        showSuccessModal(enrichedLead);
+        
+        // Reset form
+        event.target.reset();
+        
+    } catch (error) {
+        console.error('Form submission error:', error);
+        alert('Sorry, there was an error processing your request. Please try again.');
+    } finally {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
 
         function getLeadStatus(score) {
             if (score >= 80) return 'Hot Lead';
