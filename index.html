@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinFlow - Working Capital Intelligence | Growth Demo</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
         * {
             margin: 0;
@@ -447,6 +449,173 @@
                 <div id="automationLog">
                     <!-- Dynamic content -->
                 </div>
+                <!-- Add this section to your existing dashboard -->
+<div class="advanced-analytics" style="margin-top: 2rem;">
+    <!-- A/B Testing Results Section -->
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #2c3e50; display: flex; align-items: center;">
+            <span style="margin-right: 10px;">🧪</span>A/B Testing Results
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Conversion Rate Chart -->
+            <div>
+                <h4 style="margin-bottom: 1rem; color: #34495e;">Form Conversion Rates</h4>
+                <canvas id="conversionChart" width="400" height="300"></canvas>
+                <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span><strong>Winner:</strong> Variant B</span>
+                        <span style="color: #28a745;"><strong>+54% improvement</strong></span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #6c757d;">
+                        Statistical significance: 99.2% | Sample size: 2,847 visitors
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lead Quality Chart -->
+            <div>
+                <h4 style="margin-bottom: 1rem; color: #34495e;">Lead Quality Distribution</h4>
+                <canvas id="leadQualityChart" width="400" height="300"></canvas>
+                <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span><strong>Avg Score:</strong> 73.2/100</span>
+                        <span style="color: #28a745;"><strong>+18% vs baseline</strong></span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #6c757d;">
+                        High-quality leads: 42% | Target: 35%
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- A/B Test Details Table -->
+        <div style="margin-top: 2rem;">
+            <h4 style="margin-bottom: 1rem; color: #34495e;">Current A/B Tests</h4>
+            <table style="width: 100%; border-collapse: collapse; background: white;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6;">Test Name</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6;">Status</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6;">Traffic Split</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6;">Conversion Rate</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #dee2e6;">Winner</th>
+                    </tr>
+                </thead>
+                <tbody id="abTestResults">
+                    <tr>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">Form Headlines</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;"><span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">Complete</span></td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">50/50</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">18.3% vs 11.9%</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">Variant B (+54%)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">CTA Button Color</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;"><span style="background: #ffc107; color: black; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">Running</span></td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">33/33/33</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">15.2% vs 14.8% vs 16.1%</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">-</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">Industry Targeting</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;"><span style="background: #17a2b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">Planning</span></td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">-</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">-</td>
+                        <td style="padding: 12px; border: 1px solid #dee2e6;">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Industry Insights Section -->
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #2c3e50; display: flex; align-items: center;">
+            <span style="margin-right: 10px;">📊</span>FinTech Industry Insights
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Market Size -->
+            <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+                <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">$312B</div>
+                <div style="font-size: 1.1rem; opacity: 0.9;">Global FinTech Market</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">26.5% CAGR (2023-2030)</div>
+            </div>
+            
+            <!-- Average Deal Size -->
+            <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+                <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">$847K</div>
+                <div style="font-size: 1.1rem; opacity: 0.9;">Avg Deal Size</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">B2B FinTech Solutions</div>
+            </div>
+            
+            <!-- Conversion Rate -->
+            <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+                <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">3.2%</div>
+                <div style="font-size: 1.1rem; opacity: 0.9;">Industry Conversion</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">Demo → Paid Customer</div>
+            </div>
+        </div>
+        
+        <!-- Industry Benchmarks Chart -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+                <h4 style="margin-bottom: 1rem; color: #34495e;">Lead Scoring by Industry</h4>
+                <canvas id="industryChart" width="400" height="300"></canvas>
+            </div>
+            
+            <div>
+                <h4 style="margin-bottom: 1rem; color: #34495e;">Deal Velocity Trends</h4>
+                <canvas id="dealVelocityChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+        
+        <!-- Key Insights -->
+        <div style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+            <h4 style="margin-bottom: 1rem; color: #34495e;">Key Market Insights</h4>
+            <ul style="margin: 0; padding-left: 1.5rem; color: #495057;">
+                <li style="margin-bottom: 0.5rem;">FinTech CFOs show 340% higher conversion rates than other industries</li>
+                <li style="margin-bottom: 0.5rem;">Companies with 51-200 employees have optimal deal velocity (avg 67 days)</li>
+                <li style="margin-bottom: 0.5rem;">Working capital solutions see 89% faster adoption in Q4</li>
+                <li style="margin-bottom: 0.5rem;">LinkedIn engagement correlates with 43% higher deal values</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Performance Metrics Grid -->
+    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin-bottom: 1.5rem; color: #2c3e50; display: flex; align-items: center;">
+            <span style="margin-right: 10px;">⚡</span>Real-Time Performance Metrics
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+            <div style="text-align: center; padding: 1.5rem; border: 2px solid #e9ecef; border-radius: 12px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #28a745;" id="liveConversion">18.3%</div>
+                <div style="color: #6c757d; margin-top: 0.5rem;">Conversion Rate</div>
+                <div style="font-size: 0.8rem; color: #28a745; margin-top: 0.25rem;">↗ +2.1% vs last week</div>
+            </div>
+            
+            <div style="text-align: center; padding: 1.5rem; border: 2px solid #e9ecef; border-radius: 12px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #dc3545;" id="avgScore">73.2</div>
+                <div style="color: #6c757d; margin-top: 0.5rem;">Avg Lead Score</div>
+                <div style="font-size: 0.8rem; color: #28a745; margin-top: 0.25rem;">↗ +5.8% vs baseline</div>
+            </div>
+            
+            <div style="text-align: center; padding: 1.5rem; border: 2px solid #e9ecef; border-radius: 12px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #fd7e14;" id="responseTime">1.3s</div>
+                <div style="color: #6c757d; margin-top: 0.5rem;">Avg Response Time</div>
+                <div style="font-size: 0.8rem; color: #28a745; margin-top: 0.25rem;">↗ -0.2s improvement</div>
+            </div>
+            
+            <div style="text-align: center; padding: 1.5rem; border: 2px solid #e9ecef; border-radius: 12px;">
+                <div style="font-size: 2rem; font-weight: bold; color: #6f42c1;" id="qualifiedLeads">42%</div>
+                <div style="color: #6c757d; margin-top: 0.5rem;">Qualified Rate</div>
+                <div style="font-size: 0.8rem; color: #28a745; margin-top: 0.25rem;">↗ +7% vs target</div>
+            </div>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </main>
@@ -1179,10 +1348,13 @@ async function calculateLeadScore(leadData) {
         }
 
         function showDashboard() {
-            document.getElementById('dashboard').classList.add('active');
-            document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
-            trackEvent('dashboard_view', 'analytics');
-        }
+    document.getElementById('dashboard').classList.add('active');
+    document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+    trackEvent('dashboard_view', 'analytics');
+    
+    // Initialize advanced analytics charts
+    initializeAdvancedAnalytics();
+}
 
         function loadExistingLeads() {
             const stored = localStorage.getItem('demoLeads');
@@ -1217,10 +1389,359 @@ async function calculateLeadScore(leadData) {
                 closeModal();
             }
         }
+        // Advanced Analytics & A/B Testing Functions
+let analyticsCharts = {};
+
+function initializeAdvancedAnalytics() {
+    // Initialize all charts when analytics page loads
+    setTimeout(() => {
+        initializeConversionChart();
+        initializeLeadQualityChart();
+        initializeIndustryChart();
+        initializeDealVelocityChart();
+        startRealTimeMetrics();
+    }, 500);
+}
+
+function initializeConversionChart() {
+    const ctx = document.getElementById('conversionChart');
+    if (!ctx) return;
+
+    analyticsCharts.conversion = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Control (A)', 'Variant B', 'Variant C'],
+            datasets: [{
+                label: 'Conversion Rate (%)',
+                data: [11.9, 18.3, 15.7],
+                backgroundColor: [
+                    'rgba(108, 117, 125, 0.8)',
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(108, 117, 125, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const improvement = context.dataIndex === 1 ? ' (+54%)' : 
+                                              context.dataIndex === 2 ? ' (+32%)' : '';
+                            return `${context.parsed.y}%${improvement}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 20,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeLeadQualityChart() {
+    const ctx = document.getElementById('leadQualityChart');
+    if (!ctx) return;
+
+    analyticsCharts.leadQuality = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Hot Leads (80-100)', 'Qualified (60-79)', 'Warm (40-59)', 'Cold (0-39)'],
+            datasets: [{
+                data: [28, 42, 23, 7],
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.8)',
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(108, 117, 125, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(220, 53, 69, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(108, 117, 125, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.parsed}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeIndustryChart() {
+    const ctx = document.getElementById('industryChart');
+    if (!ctx) return;
+
+    analyticsCharts.industry = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Conversion Rate', 'Deal Size', 'Sales Cycle', 'Lead Quality', 'Market Size', 'Competition'],
+            datasets: [{
+                label: 'FinTech',
+                data: [95, 88, 72, 91, 85, 65],
+                borderColor: 'rgba(40, 167, 69, 1)',
+                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                pointBackgroundColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 2
+            }, {
+                label: 'Traditional Finance',
+                data: [78, 92, 45, 83, 95, 78],
+                borderColor: 'rgba(255, 193, 7, 1)',
+                backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                pointBackgroundColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 2
+            }, {
+                label: 'Technology',
+                data: [82, 76, 68, 87, 90, 85],
+                borderColor: 'rgba(23, 162, 184, 1)',
+                backgroundColor: 'rgba(23, 162, 184, 0.2)',
+                pointBackgroundColor: 'rgba(23, 162, 184, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeDealVelocityChart() {
+    const ctx = document.getElementById('dealVelocityChart');
+    if (!ctx) return;
+
+    analyticsCharts.dealVelocity = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+            datasets: [{
+                label: 'Average Deal Velocity (Days)',
+                data: [89, 82, 76, 71, 68, 65, 67, 63, 61],
+                borderColor: 'rgba(111, 66, 193, 1)',
+                backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Industry Benchmark',
+                data: [95, 94, 92, 90, 88, 87, 86, 85, 84],
+                borderColor: 'rgba(108, 117, 125, 1)',
+                backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y} days`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 50,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' days';
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
+function startRealTimeMetrics() {
+    // Simulate real-time metric updates
+    setInterval(() => {
+        updateLiveMetrics();
+    }, 5000); // Update every 5 seconds
+}
+
+function updateLiveMetrics() {
+    // Generate slight variations in metrics to simulate real-time updates
+    const conversionEl = document.getElementById('liveConversion');
+    const scoreEl = document.getElementById('avgScore');
+    const responseEl = document.getElementById('responseTime');
+    const qualifiedEl = document.getElementById('qualifiedLeads');
+    
+    if (conversionEl) {
+        const baseConversion = 18.3;
+        const variation = (Math.random() - 0.5) * 0.4; // ±0.2% variation
+        conversionEl.textContent = (baseConversion + variation).toFixed(1) + '%';
+    }
+    
+    if (scoreEl) {
+        const baseScore = 73.2;
+        const variation = (Math.random() - 0.5) * 2; // ±1 point variation
+        scoreEl.textContent = (baseScore + variation).toFixed(1);
+    }
+    
+    if (responseEl) {
+        const baseResponse = 1.3;
+        const variation = (Math.random() - 0.5) * 0.2; // ±0.1s variation
+        responseEl.textContent = Math.max(0.8, baseResponse + variation).toFixed(1) + 's';
+    }
+    
+    if (qualifiedEl) {
+        const baseQualified = 42;
+        const variation = (Math.random() - 0.5) * 2; // ±1% variation
+        qualifiedEl.textContent = Math.round(baseQualified + variation) + '%';
+    }
+}
+
+// Update dashboard navigation to include advanced analytics
+function updateDashboard() {
+    // Your existing updateDashboard code...
+    
+    // Add analytics initialization
+    if (document.querySelector('.analytics-content').style.display !== 'none') {
+        initializeAdvancedAnalytics();
+    }
+}
+
+// A/B Testing Simulation Functions
+function simulateABTest(testName, variants) {
+    const results = {
+        testName: testName,
+        status: 'running',
+        trafficSplit: variants.length === 2 ? '50/50' : '33/33/33',
+        startDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+        participants: Math.floor(Math.random() * 5000) + 1000,
+        variants: variants.map(variant => ({
+            name: variant,
+            conversions: Math.floor(Math.random() * 200) + 50,
+            visitors: Math.floor(Math.random() * 1500) + 500,
+            conversionRate: 0
+        }))
+    };
+    
+    // Calculate conversion rates
+    results.variants.forEach(variant => {
+        variant.conversionRate = (variant.conversions / variant.visitors * 100).toFixed(1);
+    });
+    
+    // Determine winner
+    const bestVariant = results.variants.reduce((best, current) => 
+        parseFloat(current.conversionRate) > parseFloat(best.conversionRate) ? current : best
+    );
+    
+    results.winner = bestVariant.name;
+    results.improvement = ((parseFloat(bestVariant.conversionRate) / parseFloat(results.variants[0].conversionRate) - 1) * 100).toFixed(0);
+    
+    return results;
+}
+
+// Industry insights data generator
+function generateIndustryInsights() {
+    return {
+        marketSize: '$312B',
+        growth: '26.5%',
+        averageDealSize: '$847K',
+        conversionRate: '3.2%',
+        insights: [
+            'FinTech CFOs show 340% higher conversion rates than other industries',
+            'Companies with 51-200 employees have optimal deal velocity (avg 67 days)',
+            'Working capital solutions see 89% faster adoption in Q4',
+            'LinkedIn engagement correlates with 43% higher deal values'
+        ],
+        benchmarks: {
+            fintech: { conversion: 95, dealSize: 88, cycle: 72, quality: 91 },
+            finance: { conversion: 78, dealSize: 92, cycle: 45, quality: 83 },
+            technology: { conversion: 82, dealSize: 76, cycle: 68, quality: 87 }
+        }
+    };
+}
+
+// Initialize advanced analytics when analytics page is viewed
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if analytics content exists and initialize charts
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                const analyticsContent = document.querySelector('.analytics-content');
+                if (analyticsContent && analyticsContent.style.display !== 'none') {
+                    initializeAdvancedAnalytics();
+                }
+            }
+        });
+    });
+    
+    const analyticsContent = document.querySelector('.analytics-content');
+    if (analyticsContent) {
+        observer.observe(analyticsContent, { attributes: true });
+    }
+});
     </script>
 </body>
 
 </html>
+
 
 
 
