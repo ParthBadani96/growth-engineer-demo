@@ -549,69 +549,283 @@ async function createHubSpotContact(leadData) {
             // Example: gtag('event', action, { event_category: category, value: value });
         }
 
-        function calculateLeadScore(leadData) {
-            let score = 0;
-            
-            // Industry scoring (fintech/finance gets highest score)
-            const industryScores = {
-                'fintech': 25,
-                'finance': 20,
-                'ecommerce': 15,
-                'manufacturing': 15,
-                'healthcare': 10,
-                'technology': 10,
-                'retail': 8,
-                'other': 5
-            };
-            score += industryScores[leadData.industry] || 5;
+        // ML-powered lead scoring class
+class MLLeadScorer {
+    constructor() {
+        this.model = null;
+        this.isModelReady = false;
+        this.trainingProgress = 0;
+        this.initializeModel();
+    }
 
+    async initializeModel() {
+        try {
+            console.log('Initializing ML model for lead scoring...');
+            
+            // Generate synthetic training data
+            const trainingData = this.generateTrainingData(2000);
+            
+            // Create neural network model
+            this.model = tf.sequential({
+                layers: [
+                    tf.layers.dense({ inputShape: [8], units: 64, activation: 'relu' }),
+                    tf.layers.dropout({ rate: 0.3 }),
+                    tf.layers.dense({ units: 32, activation: 'relu' }),
+                    tf.layers.dropout({ rate: 0.2 }),
+                    tf.layers.dense({ units: 16, activation: 'relu' }),
+                    tf.layers.dense({ units: 1, activation: 'sigmoid' })
+                ]
+            });
+
+            this.model.compile({
+                optimizer: tf.train.adam(0.001),
+                loss: 'binaryCrossentropy',
+                metrics: ['accuracy']
+            });
+
+            // Prepare training data
+            const { xs, ys } = this.prepareTrainingData(trainingData);
+            
+            // Train the model with progress updates
+            await this.model.fit(xs, ys, {
+                epochs: 100,
+                batchSize: 32,
+                validationSplit: 0.2,
+                verbose: 0,
+                callbacks: {
+                    onEpochEnd: (epoch, logs) => {
+                        this.trainingProgress = ((epoch + 1) / 100) * 100;
+                        if (epoch % 20 === 0) {
+                            console.log(`Training progress: ${this.trainingProgress.toFixed(0)}% - Accuracy: ${(logs.val_acc * 100).toFixed(1)}%`);
+                        }
+                    }
+                }
+            });
+            
+            this.isModelReady = true;
+            console.log('ML model training completed!');
+            this.updateMLStatus();
+            
+            // Clean up tensors
+            xs.dispose();
+            ys.dispose();
+            
+        } catch (error) {
+            console.error('ML model initialization failed:', error);
+            this.isModelReady = false;
+        }
+    }
+
+    generateTrainingData(count) {
+        const data = [];
+        const industries = ['fintech', 'finance', 'technology', 'healthcare', 'manufacturing', 'retail', 'other'];
+        const titles = ['ceo', 'cfo', 'vp', 'director', 'manager', 'analyst', 'specialist', 'associate'];
+        const sizes = ['1-10', '11-50', '51-200', '201-1000', '1000+'];
+        
+        for (let i = 0; i < count; i++) {
+            const industry = industries[Math.floor(Math.random() * industries.length)];
+            const title = titles[Math.floor(Math.random() * titles.length)];
+            const size = sizes[Math.floor(Math.random() * sizes.length)];
+            const timeOnPage = Math.random() * 400 + 20;
+            const scrollDepth = Math.random() * 100;
+            const formInteractions = Math.floor(Math.random() * 25);
+            const emailDomain = Math.random() > 0.7 ? 'business' : 'free';
+            const visitHour = Math.floor(Math.random() * 24);
+            
+            // Calculate realistic conversion probability
+            let conversionProbability = 0.05; // Base 5%
+            
+            // Industry scoring
+            if (industry === 'fintech') conversionProbability += 0.35;
+            else if (industry === 'finance') conversionProbability += 0.25;
+            else if (industry === 'technology') conversionProbability += 0.15;
+            
+            // Title scoring
+            if (title === 'ceo' || title === 'cfo') conversionProbability += 0.30;
+            else if (title === 'vp' || title === 'director') conversionProbability += 0.20;
+            else if (title === 'manager') conversionProbability += 0.10;
+            
             // Company size scoring
-            const sizeScores = {
-                '1-10': 5,
-                '11-50': 10,
-                '51-200': 20,
-                '201-1000': 25,
-                '1000+': 15
-            };
-            score += sizeScores[leadData.companySize] || 0;
-
-            // Job title scoring (decision makers get higher scores)
-            const titleScore = calculateTitleScore(leadData.jobTitle);
-            score += titleScore;
-
-            // Behavioral scoring
-            const behavioralScore = calculateBehavioralScore();
-            score += behavioralScore;
-
-            // Intent signals (simulated)
-            const intentScore = calculateIntentScore(leadData);
-            score += intentScore;
-
-            return Math.min(100, Math.max(0, score));
-        }
-
-        function calculateTitleScore(title) {
-            const titleLower = title.toLowerCase();
+            if (size === '51-200' || size === '201-1000') conversionProbability += 0.20;
+            else if (size === '1000+') conversionProbability += 0.15;
             
-            if (titleLower.includes('cfo') || titleLower.includes('chief financial') || 
-                titleLower.includes('finance director') || titleLower.includes('vp finance')) {
-                return 25;
-            }
-            if (titleLower.includes('ceo') || titleLower.includes('founder') || 
-                titleLower.includes('president') || titleLower.includes('owner')) {
-                return 20;
-            }
-            if (titleLower.includes('director') || titleLower.includes('manager') || 
-                titleLower.includes('head of')) {
-                return 15;
-            }
-            if (titleLower.includes('analyst') || titleLower.includes('associate') || 
-                titleLower.includes('specialist')) {
-                return 10;
-            }
-            return 5;
+            // Behavioral scoring
+            if (timeOnPage > 180) conversionProbability += 0.15;
+            if (scrollDepth > 75) conversionProbability += 0.10;
+            if (formInteractions > 8) conversionProbability += 0.12;
+            if (emailDomain === 'business') conversionProbability += 0.08;
+            if (visitHour >= 9 && visitHour <= 17) conversionProbability += 0.05;
+            
+            const converted = Math.random() < Math.min(conversionProbability, 0.85);
+            
+            data.push({
+                industry, title, size, timeOnPage, scrollDepth, 
+                formInteractions, emailDomain, visitHour, converted
+            });
+        }
+        
+        return data;
+    }
+
+    prepareTrainingData(data) {
+        const features = data.map(lead => [
+            this.encodeIndustry(lead.industry),
+            this.encodeTitle(lead.title),
+            this.encodeSize(lead.size),
+            Math.min(lead.timeOnPage / 400, 1), // Normalize to 0-1
+            lead.scrollDepth / 100,
+            Math.min(lead.formInteractions / 25, 1),
+            lead.emailDomain === 'business' ? 1 : 0,
+            this.encodeVisitTime(lead.visitHour)
+        ]);
+        
+        const labels = data.map(lead => lead.converted ? 1 : 0);
+        
+        return {
+            xs: tf.tensor2d(features),
+            ys: tf.tensor2d(labels, [labels.length, 1])
+        };
+    }
+
+    encodeIndustry(industry) {
+        const mapping = { 
+            'fintech': 1.0, 'finance': 0.8, 'technology': 0.6, 
+            'healthcare': 0.4, 'manufacturing': 0.3, 'retail': 0.2, 'other': 0.1 
+        };
+        return mapping[industry] || 0.1;
+    }
+
+    encodeTitle(title) {
+        const mapping = { 
+            'ceo': 1.0, 'cfo': 0.95, 'vp': 0.7, 'director': 0.6, 
+            'manager': 0.4, 'analyst': 0.25, 'specialist': 0.2, 'associate': 0.1 
+        };
+        return mapping[title] || 0.1;
+    }
+
+    encodeSize(size) {
+        const mapping = { 
+            '1-10': 0.2, '11-50': 0.4, '51-200': 0.9, 
+            '201-1000': 1.0, '1000+': 0.75 
+        };
+        return mapping[size] || 0.1;
+    }
+
+    encodeVisitTime(hour) {
+        // Business hours get higher score
+        if (hour >= 9 && hour <= 17) return 1.0;
+        if (hour >= 8 && hour <= 19) return 0.7;
+        return 0.3;
+    }
+
+    async predictLeadScore(leadData) {
+        if (!this.isModelReady) {
+            console.log('ML model not ready, using fallback scoring');
+            return this.fallbackScore(leadData);
         }
 
+        try {
+            const currentHour = new Date().getHours();
+            const emailDomain = this.detectEmailDomain(leadData.email);
+            
+            const features = tf.tensor2d([[
+                this.encodeIndustry(leadData.industry || 'other'),
+                this.encodeTitle((leadData.jobTitle || '').toLowerCase()),
+                this.encodeSize(leadData.companySize || ''),
+                Math.min((leadData.sessionData?.timeOnPage || 30) / 400, 1),
+                (leadData.sessionData?.scrollDepth || 20) / 100,
+                Math.min((leadData.sessionData?.formInteractions || 1) / 25, 1),
+                emailDomain === 'business' ? 1 : 0,
+                this.encodeVisitTime(currentHour)
+            ]]);
+
+            const prediction = await this.model.predict(features);
+            const probability = await prediction.data();
+            
+            features.dispose();
+            prediction.dispose();
+            
+            const score = Math.round(probability[0] * 100);
+            
+            // Add ML-specific data to lead
+            leadData.mlScore = score;
+            leadData.mlConfidence = this.calculateConfidence(probability[0]);
+            leadData.scoringMethod = 'ML';
+            
+            return score;
+            
+        } catch (error) {
+            console.error('ML prediction error:', error);
+            return this.fallbackScore(leadData);
+        }
+    }
+
+    detectEmailDomain(email) {
+        if (!email) return 'unknown';
+        const domain = email.split('@')[1]?.toLowerCase() || '';
+        const businessDomains = ['company', 'corp', 'inc', 'ltd', 'llc'];
+        const freeDomains = ['gmail', 'yahoo', 'hotmail', 'outlook'];
+        
+        if (businessDomains.some(bd => domain.includes(bd))) return 'business';
+        if (freeDomains.some(fd => domain.includes(fd))) return 'free';
+        if (domain.length > 0 && !freeDomains.includes(domain.split('.')[0])) return 'business';
+        return 'free';
+    }
+
+    calculateConfidence(probability) {
+        const distance = Math.abs(probability - 0.5);
+        if (distance > 0.4) return 'Very High';
+        if (distance > 0.3) return 'High';
+        if (distance > 0.2) return 'Medium';
+        return 'Low';
+    }
+
+    fallbackScore(leadData) {
+        let score = 20; // Base score
+        
+        // Industry scoring
+        const industryScores = { 'fintech': 25, 'finance': 20, 'technology': 15 };
+        score += industryScores[leadData.industry] || 5;
+        
+        // Title scoring
+        const title = (leadData.jobTitle || '').toLowerCase();
+        if (title.includes('cfo') || title.includes('ceo')) score += 25;
+        else if (title.includes('director') || title.includes('vp')) score += 15;
+        else score += 5;
+        
+        // Size scoring
+        const sizeScores = { '51-200': 20, '201-1000': 25, '1000+': 15 };
+        score += sizeScores[leadData.companySize] || 5;
+        
+        leadData.scoringMethod = 'Fallback';
+        return Math.min(100, score);
+    }
+
+    updateMLStatus() {
+        const indicator = document.createElement('div');
+        indicator.innerHTML = `
+            <div style="position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 12px 16px; border-radius: 25px; font-size: 13px; font-weight: 600; z-index: 1000; box-shadow: 0 6px 20px rgba(0,0,0,0.15); animation: slideIn 0.5s ease-out;">
+                <span style="margin-right: 8px;">🤖</span>AI Lead Scoring Active
+                <div style="font-size: 11px; opacity: 0.9; margin-top: 2px;">Neural Network Trained</div>
+            </div>
+            <style>
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            </style>
+        `;
+        document.body.appendChild(indicator);
+    }
+}
+
+// Initialize ML scorer
+const mlScorer = new MLLeadScorer();
+
+// New ML-powered lead scoring function
+async function calculateLeadScore(leadData) {
+    return await mlScorer.predictLeadScore(leadData);
+}
         function calculateBehavioralScore() {
             let score = 0;
             
@@ -1007,3 +1221,4 @@ async function createHubSpotContact(leadData) {
 </body>
 
 </html>
+
