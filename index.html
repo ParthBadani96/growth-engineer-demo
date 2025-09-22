@@ -656,13 +656,19 @@ async function createHubSpotContact(leadData) {
 
         const result = await response.json();
         console.log('Backend success:', result);
+        
+        // Merge enrichment data back into leadData
+        if (result.enrichmentData) {
+            Object.assign(leadData, result.enrichmentData);
+        }
+        
         return result.contact;
 
     } catch (error) {
         console.error('Backend integration error:', error);
         throw error;
     }
-}     
+}
         // Global variables for demo
         let leads = [];
         let pageStartTime = Date.now();
@@ -1750,6 +1756,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
 
 
 
