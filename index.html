@@ -1147,6 +1147,13 @@ async function calculateLeadScore(leadData) {
                 timestamp: new Date().toISOString()
             });
         }
+
+        // Add this after HubSpot contact creation
+addAutomationLog(enrichedLead.firstName + ' ' + enrichedLead.lastName, {
+    action: '🔍 Lead enriched with Clay data (LinkedIn, company details, tech stack)',
+    priority: 'Medium',
+    timestamp: new Date().toISOString()
+});
         
         // Store lead locally (backup)
         leads.push(enrichedLead);
@@ -1255,26 +1262,27 @@ async function calculateLeadScore(leadData) {
         }
 
         function updateLeadsTable() {
-            const tbody = document.getElementById('leadsTableBody');
-            tbody.innerHTML = '';
-            
-            leads.slice(-10).reverse().forEach(lead => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${lead.firstName} ${lead.lastName}</td>
-                    <td>${lead.company}</td>
-                    <td>${lead.industry || 'N/A'}</td>
-                    <td><span class="score-badge ${getScoreClass(lead.score)}">${lead.score}</span></td>
-                    <td>${lead.status}</td>
-                    <td>
-                        <button onclick="viewLeadDetails('${lead.id}')" style="padding: 0.3rem 0.8rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                            View Details
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+    const tbody = document.getElementById('leadsTableBody');
+    tbody.innerHTML = '';
+    
+    leads.slice(-10).reverse().forEach(lead => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${lead.firstName} ${lead.lastName}</td>
+            <td>${lead.company}</td>
+            <td>${lead.industry || 'N/A'}</td>
+            <td><span class="score-badge ${getScoreClass(lead.score)}">${lead.score}</span></td>
+            <td>${lead.status}</td>
+            <td>
+                <button onclick="viewLeadDetails('${lead.id}')" style="padding: 0.3rem 0.8rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    View Details
+                </button>
+                ${lead.linkedinUrl ? `<br><small style="color: #28a745;">✓ Clay Enriched</small>` : ''}
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
         function getScoreClass(score) {
             if (score >= 70) return 'score-high';
@@ -1329,6 +1337,16 @@ async function calculateLeadScore(leadData) {
             <li>Seniority level: ${lead.jobTitle?.includes('C') || lead.jobTitle?.includes('VP') ? 'Decision maker' : 'Influencer'}</li>
             <li>Behavioral signals: ${lead.sessionData?.timeOnPage > 120 ? 'High' : 'Medium'} engagement</li>
             <li>Conversion probability: ${lead.mlScore > 70 ? 'High' : lead.mlScore > 40 ? 'Medium' : 'Low'}</li>
+        </ul>
+
+        <h5 style="margin-top: 1rem;">🔍 Clay Enrichment Data:</h5>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem; background: #e8f5e8; padding: 1rem; border-radius: 5px;">
+            <li><strong>LinkedIn:</strong> ${lead.linkedinUrl || 'Not found'}</li>
+            <li><strong>Seniority:</strong> ${lead.seniority || 'Unknown'}</li>
+            <li><strong>Department:</strong> ${lead.department || 'Unknown'}</li>
+            <li><strong>Company Revenue:</strong> ${lead.companyRevenue || 'Unknown'}</li>
+            <li><strong>Technologies:</strong> ${lead.technologies ? lead.technologies.join(', ') : 'Unknown'}</li>
+            <li><strong>Experience:</strong> ${lead.experience_years || 'Unknown'} years</li>
         </ul>
     </div>
 `;
@@ -1732,6 +1750,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
 
 
 
