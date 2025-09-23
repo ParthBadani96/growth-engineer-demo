@@ -656,10 +656,12 @@ async function createHubSpotContact(leadData) {
 
         const result = await response.json();
         console.log('Backend success:', result);
+        console.log('Enrichment data received:', result.enrichmentData); // ADD THIS
         
         // Merge enrichment data back into leadData
         if (result.enrichmentData) {
             Object.assign(leadData, result.enrichmentData);
+            console.log('Merged enrichment data into lead:', leadData); // ADD THIS
         }
         
         return result.contact;
@@ -1756,6 +1758,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
 
 
 
