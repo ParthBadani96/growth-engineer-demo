@@ -2000,8 +2000,49 @@ Session Data:
         loadLiveActivity();
         setInterval(loadLiveActivity, 10000);
     </script>
+    <script>
+  document.getElementById('leadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    
+    // Track form submission in Google Analytics
+    gtag('event', 'form_submission', {
+      event_category: 'Lead',
+      event_label: 'Landing Page Form'
+    });
+    
+    // Submit to your GTM Platform API
+    try {
+      const response = await fetch('https://workspace.parthbadani96.replit.dev/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (response.ok) {
+        // Show success message
+        alert('Thank you! We\'ll be in touch soon.');
+        e.target.reset();
+        
+        // Track successful submission
+        gtag('event', 'form_success', {
+          event_category: 'Lead',
+          event_label: 'Form Submitted Successfully'
+        });
+      } else {
+        alert('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('Unable to submit form. Please try again later.');
+    }
+  });
+  </script>
 </body>
 </html>
+
 
 
 
