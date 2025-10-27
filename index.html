@@ -365,14 +365,15 @@
     </div>
     
     <script>
-        // Backend configurations - UPDATE THESE
+        // ✅ CORRECTED API ENDPOINTS - Make sure these EXACT URLs are used!
         const API_ENDPOINTS = {
-            production: 'https://workspace.parthbadani96.replit.dev/api/leads',
-            backup: 'https://gtmfinflow.replit.app/api/leads',
-            local: 'http://localhost:3000/api/leads'
+            // Primary endpoint - production deployment with CORS enabled
+            production: 'https://gtmfinflow.replit.app/api/leads',
+            // Backup endpoint - always-on workspace URL
+            backup: 'https://workspace.parthbadani96.replit.dev/api/leads'
         };
         
-        // Use production by default, fallback to backup if needed
+        // Use production by default
         let currentEndpoint = API_ENDPOINTS.production;
         
         document.getElementById('leadForm').addEventListener('submit', async (e) => {
@@ -402,7 +403,8 @@
             });
             
             try {
-                // Try primary endpoint
+                // Try primary endpoint first
+                console.log('Attempting submission to:', currentEndpoint);
                 const response = await fetch(currentEndpoint, {
                     method: 'POST',
                     headers: {
@@ -411,10 +413,13 @@
                     body: JSON.stringify(data)
                 });
                 
+                console.log('Response status:', response.status);
+                
+                // If primary fails and we haven't tried backup yet, try backup
                 if (!response.ok && currentEndpoint === API_ENDPOINTS.production) {
-                    // Fallback to backup endpoint
                     console.log('Primary endpoint failed, trying backup...');
                     currentEndpoint = API_ENDPOINTS.backup;
+                    
                     const backupResponse = await fetch(currentEndpoint, {
                         method: 'POST',
                         headers: {
@@ -423,17 +428,21 @@
                         body: JSON.stringify(data)
                     });
                     
+                    console.log('Backup response status:', backupResponse.status);
+                    
                     if (!backupResponse.ok) {
                         throw new Error('Both endpoints failed');
                     }
                     
                     const result = await backupResponse.json();
+                    console.log('Success via backup:', result);
                     handleSuccess(result);
                 } else if (response.ok) {
                     const result = await response.json();
+                    console.log('Success via primary:', result);
                     handleSuccess(result);
                 } else {
-                    throw new Error('Submission failed');
+                    throw new Error(`Submission failed with status: ${response.status}`);
                 }
                 
             } catch (error) {
@@ -460,21 +469,20 @@
             gtag('event', 'form_success', {
                 event_category: 'Lead',
                 event_label: 'Form Submitted Successfully',
-                value: result.score || 0
+                value: result.overallScore || result.score || 0
             });
             
             // Track lead quality
-            if (result.category) {
+            if (result.leadType || result.category) {
                 gtag('event', 'lead_qualified', {
                     event_category: 'Lead Quality',
-                    event_label: result.category,
-                    value: result.score
+                    event_label: result.leadType || result.category,
+                    value: result.overallScore || result.score || 0
                 });
             }
             
-            console.log('Lead processed:', result);
+            console.log('✅ Lead processed successfully:', result);
         }
     </script>
 </body>
 </html>
-
