@@ -514,7 +514,7 @@
                 <li><a href="#features" onclick="trackEvent('nav_click', 'features')">Features</a></li>
                 <li><a href="#pricing" onclick="trackEvent('nav_click', 'pricing')">Pricing</a></li>
                 <li><a href="#demo" onclick="trackEvent('nav_click', 'demo')">Demo</a></li>
-                <li><a href="https://autonomous-agent-production.up.railway.app/" onclick="showGTMDashboard()">GTM Analytics</a></li>
+                <li><a href="https://gtmfinflow.replit.app/" onclick="showGTMDashboard()">GTM Analytics</a></li>            
             </ul>
         </nav>
     </header>
@@ -597,7 +597,7 @@
   <h3>What Happens Next?</h3>
   <p>After you submit, watch the magic:</p>
   <ol>
-    <li>Check the <a href="https://autonomous-agent-production.up.railway.app/">Autonomous Agent Dashboard</a> - your lead will appear in real-time</li>
+    <li>Check the <a href="https://gtmfinflow.replit.app/">GTM Dashboard</a> - your lead will appear in real-time</li>
     <li>Ask the agent: "Which contacts should I reach out to today?"</li>
     <li>See your contact in HubSpot (if you want access, DM me)</li>
   </ol>
@@ -1975,7 +1975,7 @@ Session Data:
         // Add the new function here
         async function loadLiveActivity() {
             try {
-                const response = await fetch('https://autonomous-agent-production.up.railway.app/api/status');
+                const response = await fetch('https://gtmfinflow.replit.app/api/status');
                 const data = await response.json();
                 
                 const feed = document.getElementById('liveActivityFeed');
@@ -2001,47 +2001,81 @@ Session Data:
         setInterval(loadLiveActivity, 10000);
     </script>
     <script>
-  document.getElementById('leadForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
-    
-    // Track form submission in Google Analytics
+  <script>
+document.getElementById('leadForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const submitButton = e.target.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = 'Processing...';
+  
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  
+  // Capture UTM parameters from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('utm_source')) data.utmSource = urlParams.get('utm_source');
+  if (urlParams.get('utm_medium')) data.utmMedium = urlParams.get('utm_medium');
+  if (urlParams.get('utm_campaign')) data.utmCampaign = urlParams.get('utm_campaign');
+  if (urlParams.get('utm_content')) data.utmContent = urlParams.get('utm_content');
+  if (urlParams.get('utm_term')) data.utmTerm = urlParams.get('utm_term');
+  
+  // Track form submission in Google Analytics
+  if (typeof gtag !== 'undefined') {
     gtag('event', 'form_submission', {
       event_category: 'Lead',
-      event_label: 'Landing Page Form'
+      event_label: 'Landing Page Form',
+      utm_source: data.utmSource || 'direct',
+      utm_medium: data.utmMedium || 'none',
+      utm_campaign: data.utmCampaign || 'none'
+    });
+  }
+  
+  // ✅ CRITICAL FIX: Correct Replit backend URL
+  try {
+    const response = await fetch('https://gtmfinflow.replit.app/api/leads', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data)
     });
     
-    // Submit to your GTM Platform API
-    try {
-      const response = await fetch('https://workspace.parthbadani96.replit.dev/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Lead created:', result);
       
-      if (response.ok) {
-        // Show success message
-        alert('Thank you! We\'ll be in touch soon.');
-        e.target.reset();
-        
-        // Track successful submission
+      // Show success message
+      alert('✅ Thank you! Your demo request has been received. Our team will contact you shortly.');
+      e.target.reset();
+      
+      // Track successful submission
+      if (typeof gtag !== 'undefined') {
         gtag('event', 'form_success', {
           event_category: 'Lead',
-          event_label: 'Form Submitted Successfully'
+          event_label: 'Form Submitted Successfully',
+          value: 1
         });
-      } else {
-        alert('Something went wrong. Please try again.');
       }
-    } catch (error) {
-      console.error('Submission error:', error);
-      alert('Unable to submit form. Please try again later.');
+    } else {
+      const errorText = await response.text();
+      console.error('Server error:', errorText);
+      alert('⚠️ Something went wrong. Please try again or contact us directly.');
     }
-  });
-  </script>
+  } catch (error) {
+    console.error('Submission error:', error);
+    alert('❌ Unable to submit form. Please check your internet connection and try again.');
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
+});
+</script>
 </body>
 </html>
+
 
 
 
